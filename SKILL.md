@@ -1,7 +1,7 @@
 ---
 name: ai-folder-organize
 description: AI File Organizer for Firefly AI Folder. Local AI file analysis, auto-categorization, smart renaming, auto-tagging, deduplication, semantic search, progress monitoring, and virtual directory plans. / 萤核智能文件夹AI整理助手。支持本地AI文件分析、智能分类与命名、自动打标、查重去重、全文搜索、进度监控与独创多维虚拟目录整理方案。
-version: 1.0.0
+version: 1.0.1
 metadata:
   openclaw:
     requires:
