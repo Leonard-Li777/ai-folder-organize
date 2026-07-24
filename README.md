@@ -100,7 +100,13 @@ ai-folder-organize/
 
 ### 1. Installation
 
-Clone or copy this directory into your OpenClaw skills path or your AI Agent's skill folder:
+#### Option A: GitHub Import (ClawHub)
+Directly import this skill into ClawHub or your OpenClaw environment:
+1. Open ClawHub (`https://clawhub.ai` or your OpenClaw skill manager).
+2. Choose **Import from GitHub** and specify this repository URL: `https://github.com/Leonard-Li777/ai-folder-organize`.
+
+#### Option B: Git Clone / Manual Copy
+Clone or copy this directory into your OpenClaw skills directory:
 
 ```bash
 git clone https://github.com/Leonard-Li777/ai-folder-organize.git ~/.openclaw/workspace/skills/ai-folder-organize

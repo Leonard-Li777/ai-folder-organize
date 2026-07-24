@@ -100,6 +100,12 @@ ai-folder-organize/
 
 ### 1. 安装 Skill
 
+#### 方式 A：GitHub Import（ClawHub / OpenClaw 导入）
+支持通过 GitHub 导入至 ClawHub / OpenClaw 环境：
+1. 打开 ClawHub 平台界面或本地 OpenClaw 工作区。
+2. 选择 **Import from GitHub** 并填写本仓库地址：`https://github.com/Leonard-Li777/ai-folder-organize`。
+
+#### 方式 B：Git Clone / 手动复制
 将本项目克隆或复制到 OpenClaw 的 skills 目录或你的 AI Agent 技能目录中：
 
 ```bash

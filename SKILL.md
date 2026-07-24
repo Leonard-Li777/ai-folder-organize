@@ -3,14 +3,12 @@ name: ai-folder-organize
 description: 'AI File Organizer for Firefly AI Folder. Analyze, categorize, smart-rename, batch-rename, smart-delete-duplicates, tag, find-duplicates, smart-move organize files by AI. Search files, monitor analysis progress, manage virtual directories, smart organization plans. / 萤核智能文件夹AI整理助手。AI分析、智能分类、智能命名、自动打标、自动描述、文件搜索、进度监控、虚拟目录管理、整理方案生成、文件去重、文件移动，智能处理个人与工作文件，独创的虚拟目录功能，在不影响真实文件，不占硬盘空间的情况下给你多种视角的文件归类。'
 version: 1.0.0
 metadata:
-  openclaw: '{"requires":{"bins":["node"]},"emoji":"📁","homepage":"https://aifolder.iocn.cn"}'
-  keywords:
-    - file-organizer / file-organizing / 文件整理器 / 归档
-    - auto-sort / auto-categorize / 自动分类 / 自动排序
-    - file-cleaner / declutter / 桌面清理 / 去杂物
-    - duplicate-finder / 查重 / 删重
-    - file-renamer / batch-rename / 批量重命名
-    - tagging / auto-tagging / 自动打标签
+  openclaw:
+    requires:
+      bins:
+        - node
+    emoji: "📁"
+    homepage: https://aifolder.iocn.cn
 ---
 
 # AI Folder Organize
