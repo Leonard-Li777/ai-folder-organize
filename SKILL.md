@@ -222,12 +222,55 @@ const result = await fetch(API + '/api/extract/text', {
 1. 同时调用 `/api/analysis/queue-status` 和 `/api/analysis/progress`
 2. 整合系统是否空闲、队列积压数、分析进度百分比后汇报
 
-### 搜索文件
+### 搜索文件 (V4 渐进式流式与视频高光切片检索)
 
 用户想搜索或查找文件时：
 
-1. `fetch(API + '/api/files/search?keyword=xxx&scope=real')`
-2. 以列表形式展示匹配的文件名和路径
+#### 方式一：单次最终结果模式（默认推荐，一次性拿全）
+
+```js
+const res = await fetch(API + '/api/files/search?keyword=产品发布会&mode=final').then(r => r.json())
+if (res.success) {
+  console.log(`共检索到 ${res.data.total} 条文件`)
+  for (const item of res.data.items) {
+    console.log(`- [${item.mediaType}] ${item.name} (${item.path})`)
+    if (item.hasVideoSegments && item.videoSegments.length > 0) {
+      console.log(`  🎬 命中视频高光片段：`)
+      for (const seg of item.videoSegments) {
+        console.log(`     • ${seg.startSec}s ~ ${seg.endSec}s (推荐跳转点: ${seg.seekSec}s, 相似度: ${Math.round(seg.score * 100)}%)`)
+        if (seg.textSnippet) console.log(`       字幕/内容: "${seg.textSnippet}"`)
+      }
+    }
+  }
+}
+```
+
+#### 方式二：两阶段流式接收 (SSE，首屏毫秒级响应)
+
+```js
+// 在 Node.js / Agent 脚本中使用 fetch + ReadableStream 或 EventSource 监听
+const eventSource = new EventSource(API + '/api/files/search?keyword=发布会&mode=stream')
+
+eventSource.addEventListener('phase1', (event) => {
+  const data = JSON.parse(event.data)
+  console.log('⚡ [Phase 1 字面快搜首屏]', data.items.map(i => i.name))
+})
+
+eventSource.addEventListener('phase2', (event) => {
+  const data = JSON.parse(event.data)
+  console.log('🎯 [Phase 2 语义重排与视频切片置换]', data.items)
+})
+
+eventSource.addEventListener('done', () => {
+  // 必须显式关闭连接，防范 EventSource 自动重连
+  eventSource.close()
+})
+
+eventSource.addEventListener('error', (err) => {
+  console.error('搜索异常', err)
+  eventSource.close()
+})
+```
 
 ### 获取文件分析详情（推荐方式）
 

@@ -168,7 +168,7 @@ function findConfigPath(dataDirs) {
  */
 function checkPortReachable(host, port, timeoutMs = 3000) {
   return new Promise(resolve => {
-    const req = http.get(`http://${host}:${port}/api/workspaces`, { timeout: timeoutMs }, res => {
+    const req = http.get(`http://${host}:${port}/api/health`, { timeout: timeoutMs }, res => {
       resolve(true)
       res.resume()
     })
@@ -185,7 +185,7 @@ function checkPortReachable(host, port, timeoutMs = 3000) {
 function getFeatureList() {
   return [
     '🏷️ 获取文件已分析数据  —— 读取文件的 AI 标签、自然语言内容描述、质量评分与智能重命名建议',
-    '🔍 智能语义与全文搜索  —— 按关键词、标签或语义摘要精准检索已分析的文件',
+    '🔍 V4 渐进式搜索与切片 —— 支持两阶段快速召回与视频时序切片（起止秒数/播放跳轴定位）',
     '📂 工作区及文件结构管理 —— 获取所有添加的工作区及其目录树',
     '📊 分析进度与队列监控  —— 实时查询 AI 分析队列积压数、当前分析文件名与总体完成百分比',
     '📁 虚拟目录管理与规划  —— 获取/创建自动生成的多视角整理方案（如按项目、属性、分类等）',
@@ -201,17 +201,22 @@ function getFeatureList() {
 
 function outputNotStarted(appName) {
   console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-  console.error(` ⏻  ${appName} 已安装，但应用当前尚未启动`)
+  console.error(` ⏻  ${appName} 已安装，但当前服务尚未启动或插件未开启`)
   console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.error('')
-  console.error(` 请先启动 ${appName}，然后重试本操作。`)
+  console.error(` 请按以下步骤排查与启用：`)
   console.error('')
-  console.error(' 💡 快速启动方式：')
-  console.error('   • Windows: 在桌面或开始菜单中搜索并双击 "萤核智能文件夹"')
-  console.error('   • macOS:   在 "应用程序 (Applications)" 中打开 Firefly AI Folder')
+  console.error(' 1️⃣  确认应用已启动：')
+  console.error('   • Windows: 在开始菜单或桌面双击 "萤核智能文件夹"')
+  console.error('   • macOS:   在 Applications 中启动 Firefly AI Folder')
   console.error('   • Linux:   在应用列表中启动或执行 `firefly-ai-folder`')
   console.error('')
-  console.error(' ⏱️  启动后后台 API 服务会自动运行，通常只需等待 3~5 秒。')
+  console.error(' 2️⃣  确认已在桌面端启用插件：')
+  console.error('   • 打开应用后，点击顶栏头像左侧的【🧩 插件中心】')
+  console.error('   • 在「工具」类目中找到【AI 整理助手与外部智能体 Skill API】')
+  console.error('   • 点击【安装】并切换为【已启用】状态')
+  console.error('')
+  console.error(' ⏱️  插件启用后后台服务将即刻监听端口并同步配置。')
   console.error('')
   console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 }

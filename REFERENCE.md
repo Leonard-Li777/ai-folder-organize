@@ -106,26 +106,68 @@
 
 ## GET /api/files/search
 
-全文搜索文件。
+V4 混合全文与语义检索文件（支持两阶段渐进式返回与视频切片高光定位）。
 
 **参数**:
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| `keyword` | string | 是 | 搜索关键词 |
+| `keyword` | string | 是 | 搜索关键词（支持多语言、拼音缩写及自然语言短语） |
+| `mode` | string | 否 | 响应模式：`final`（默认，8s 超时返回最终融合全量结果）、`stream`（SSE 分阶段推送） |
+| `scope` | string | 否 | 范围：`real`（默认真实工作区）, `virtual`（虚拟目录）, `all`（全域） |
 | `workspaceId` | number | 否 | 工作区 ID（仅 `scope=real` 时有效） |
-| `scope` | string | 否 | `real`（默认）, `virtual`, `all` |
 | `virtualDirectoryId` | number | 否 | 虚拟目录 ID（仅 `scope=virtual` 时有效） |
-| `limit` | number | 否 | 分页大小（默认 20） |
+| `limit` | number | 否 | 分页大小（默认 20，上限 50） |
 | `offset` | number | 否 | 分页偏移（默认 0） |
 
-**返回**:
+**返回 (mode=final 单次 JSON 响应)**:
 
 ```json
 {
   "success": true,
-  "data": [{ "id": 1, "path": "D:\\...\\file.txt", "name": "file.txt", "scope": "real" }]
+  "data": {
+    "total": 42,
+    "isSettled": true,
+    "searchDurationMs": 348,
+    "degraded": false,
+    "degradedReasons": [],
+    "clipPending": false,
+    "items": [
+      {
+        "id": "105",
+        "name": "产品发布会录像.mp4",
+        "path": "D:\\videos\\2026_launch.mp4",
+        "score": 0.94,
+        "matchType": "video_chunk",
+        "mediaType": "video",
+        "hasVideoSegments": true,
+        "snippet": "...新一代文件智能整理架构正式亮相...",
+        "videoSegments": [
+          {
+            "chunkIndices": [4],
+            "startSec": 132.0,
+            "endSec": 156.5,
+            "repPtsSec": 140.0,
+            "seekSec": 132.0,
+            "score": 0.94,
+            "textSnippet": "这里是发布会重点介绍的智能流式搜索与视频定位功能"
+          }
+        ],
+        "videoSegmentsTotal": 1,
+        "videoSegmentsTruncated": false
+      }
+    ]
+  }
 }
 ```
+
+**返回 (mode=stream SSE 流式推送)**:
+
+响应头为 `Content-Type: text/event-stream; charset=utf-8`。
+
+- `event: phase1`：字面与缓存快速召回（首屏快速响应，通常无视频切片）
+- `event: phase2`：语义多路召回、融合重排与视频切片结果（全量置换 phase1 列表）
+- `event: done`：搜索完成通知，客户端收到后请关闭 EventSource 连接
+- `event: error`：异常通知，如限流或引擎错误
 
 ---
 

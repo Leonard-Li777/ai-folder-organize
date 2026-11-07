@@ -150,7 +150,7 @@ _若桌面应用未安装或未启动，`discover.js` 会以退出码 `1` 退出
 | `/api/analysis/queue-status` | `GET`    | 获取分析队列积压状态及当前处理文件名             |
 | `/api/analysis/progress`     | `GET`    | 获取整体分析完成百分比                           |
 | `/api/files/analysis-data`   | `GET`    | 查询指定文件的 AI 分析数据（标签、描述、评分等） |
-| `/api/files/search`          | `GET`    | 全文与语义关键词文件检索                         |
+| `/api/files/search`          | `GET`    | V4 渐进式搜索与视频高光切片检索（支持 final/stream 双模） |
 | `/api/organize/templates`    | `GET`    | 获取针对当前工作区文件的 AI 整理方案提示词       |
 | `/api/organize/apply-plan`   | `POST`   | 将整理方案推送至客户端自定义虚拟目录弹窗         |
 | `/api/virtual-directories`   | `GET`    | 查询已保存的虚拟目录树                           |

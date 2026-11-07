@@ -150,7 +150,7 @@ _If the desktop app is not installed or not running, `discover.js` will exit wit
 | `/api/analysis/queue-status` | `GET`  | Get analysis queue backlog status and current file           |
 | `/api/analysis/progress`     | `GET`  | Get overall file analysis completion percentage              |
 | `/api/files/analysis-data`   | `GET`  | Query detailed AI metadata (tags, summary, score) for a file |
-| `/api/files/search`          | `GET`  | Full-text & semantic keyword file search                     |
+| `/api/files/search`          | `GET`  | V4 Progressive search & video chunk retrieval (final/stream) |
 | `/api/organize/templates`    | `GET`  | Get organization prompt templates for LLM reasoning          |
 | `/api/organize/apply-plan`   | `POST` | Send custom virtual directory plan to desktop app modal      |
 | `/api/virtual-directories`   | `GET`  | Query existing virtual directory structures                  |
