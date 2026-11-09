@@ -166,11 +166,44 @@ function findConfigPath(dataDirs) {
 /**
  * 阶段三：检测端口是否可连接
  */
-function checkPortReachable(host, port, timeoutMs = 3000) {
+function checkPortReachable(host, port, expectedConfig, timeoutMs = 3000) {
   return new Promise(resolve => {
     const req = http.get(`http://${host}:${port}/api/health`, { timeout: timeoutMs }, res => {
-      resolve(true)
-      res.resume()
+      if (res.statusCode !== 200) {
+        res.resume()
+        resolve(false)
+        return
+      }
+      let rawData = ''
+      res.on('data', chunk => {
+        rawData += chunk
+      })
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(rawData)
+          const data = json.data || json
+          if (data.service !== 'firefly-ai-skill-api' || data.status !== 'ok' || data.schemaVersion !== 1) {
+            resolve(false)
+            return
+          }
+          if (expectedConfig && expectedConfig.pid && data.pid && expectedConfig.pid !== data.pid) {
+            resolve(false)
+            return
+          }
+          if (
+            expectedConfig &&
+            expectedConfig.startedAt &&
+            data.startedAt &&
+            expectedConfig.startedAt !== data.startedAt
+          ) {
+            resolve(false)
+            return
+          }
+          resolve(true)
+        } catch {
+          resolve(false)
+        }
+      })
     })
     req.on('error', () => resolve(false))
     req.on('timeout', () => {
@@ -201,7 +234,7 @@ function getFeatureList() {
 
 function outputNotStarted(appName) {
   console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-  console.error(` ⏻  ${appName} 已安装，但当前服务尚未启动或插件未开启`)
+  console.error(` ⏻  ${appName} 已安装，但当前对外接口尚未开启`)
   console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.error('')
   console.error(` 请按以下步骤排查与启用：`)
@@ -211,12 +244,12 @@ function outputNotStarted(appName) {
   console.error('   • macOS:   在 Applications 中启动 Firefly AI Folder')
   console.error('   • Linux:   在应用列表中启动或执行 `firefly-ai-folder`')
   console.error('')
-  console.error(' 2️⃣  确认已在桌面端启用插件：')
-  console.error('   • 打开应用后，点击顶栏头像左侧的【🧩 插件中心】')
-  console.error('   • 在「工具」类目中找到【AI 整理助手与外部智能体 Skill API】')
-  console.error('   • 点击【安装】并切换为【已启用】状态')
+  console.error(' 2️⃣  确认已在系统设置中启用对外接口：')
+  console.error('   • 打开应用后，点击左下角【⚙️ 系统设置】')
+  console.error('   • 在分类列表中选择【萤核对外接口】')
+  console.error('   • 将【启用外部智能体与 Skill 接口】开关开启')
   console.error('')
-  console.error(' ⏱️  插件启用后后台服务将即刻监听端口并同步配置。')
+  console.error(' ⏱️  开关开启后后台服务将即刻监听端口并同步配置。')
   console.error('')
   console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 }
@@ -258,7 +291,7 @@ async function main() {
     process.exit(1)
   }
 
-  if (!config.port) {
+  if (!config.port || config.schemaVersion !== 1) {
     outputNotStarted(APP_DISPLAY_NAME)
     process.exit(1)
   }
@@ -271,7 +304,7 @@ async function main() {
   const isRecentConfig = !isNaN(configTime) && Date.now() - configTime < 60000 // 60秒以内的最近启动
 
   // ===== 阶段三：检测端口可连 =====
-  const reachable = await checkPortReachable(host, port)
+  const reachable = await checkPortReachable(host, port, config)
   if (!reachable) {
     if (isRecentConfig) {
       // 最近 60 秒内有启动动作且端口暂未通 => 真正的应用正在初始化
